@@ -1,0 +1,27 @@
+Package \texttt{fastautils} contains functions that expand the
+features of the external package \texttt{fasta} that deals with
+biological sequences:
+\begin{verbatim}
+https://github.com/evolbioinf/fasta
+\end{verbatim}
+I see the \texttt{fastautils} package as a compromise between
+suggesting edits to the original package \texttt{fasta} (which I do
+not own), forking it, or embedding it into my custom package. The
+direct edits are tempting but they are not always possible and they do
+violate the separation of concerns principle. The forking
+of \texttt{fasta} spawns a dependency conflict if the fork and the
+original package are used together. Finally, I abandoned the idea of
+embedding as it quickly became unwieldy and confusing. For example,
+this is how I was going to call constructor
+method \texttt{NewSequence}:
+\begin{verbatim}
+func NewSequence(h string, d []byte) *Sequence {
+     return &Sequence{
+            Sequence: *fasta.NewSequence(h, d)
+     }
+}
+\end{verbatim}
+...leave alone the need to convert \texttt{Sequence} back
+to \texttt{fasta.Sequence} for compatibility.  Well, perhaps I was
+doing it wrong. Ultimately, it would be easier to just write some
+straightforward functions, would it not?..

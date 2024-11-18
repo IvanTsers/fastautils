@@ -1,0 +1,38 @@
+#+begin_export latex
+The package \texttt{fastautils} has hooks for imports and functions.
+#+end_export
+#+begin_src go <<fastautils.go>>=
+  package fastautils
+  import (
+	  //<<Imports>>
+  )
+  //<<Functions>>
+#+end_src
+#+begin_export latex
+\subsection{\texttt{Clean}}
+!Function \texttt{Clean} removes non-canonical nucleotides from a
+!\texttt{Sequence} (that is, keeps only
+!\texttt{ATGC}/\texttt{atgc}). The function updates the input sequence
+!in place.
+#+end_export
+#+begin_src go <<Functions>>=
+  func Clean(s *fasta.Sequence) {
+	  d := s.Data()
+	  i := 0
+	  for _, c := range d {
+		  if c == 'A' || c == 'C' || c == 'G' || c == 'T' ||
+		     c == 'a' || c == 'c' || c == 'g' || c == 't' {
+		       d[i] = c
+		       i++
+	     }
+	  }
+	  d = d[:i]
+	  *s = *fasta.NewSequence(s.Header(), d)
+  }
+#+end_src
+#+begin_export latex
+We import \texttt{fasta} and \texttt{bytes}.
+#+end_export
+#+begin_src go <<Imports>>=
+  "github.com/evolbioinf/fasta"
+#+end_src

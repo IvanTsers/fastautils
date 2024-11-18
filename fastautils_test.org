@@ -1,0 +1,36 @@
+#+begin_export latex
+We import the \texttt{testing} package and add hooks for further
+imports and functions.
+#+end_export
+#+begin_src go <<fastautils_test.go>>=
+  package fastautils
+  import (
+	  "testing"
+	  //<<Testing imports>>
+  )
+  //<<Testing functions>>
+#+end_src
+#+begin_export latex
+\subsubsection{\texttt{Clean}}
+To test this funtion, we generate a short sequence containing
+non-canonical nucleotides, call the function, and compare what we want
+with what we get.
+#+end_export
+#+begin_src go <<Testing functions>>=
+  func TestClean(t *testing.T){
+	  s := "XXATATNGTnCactAploenTTg"
+	  w := "ATATGTCactATTg"
+	  seq := fasta.NewSequence("", []byte(s))
+	  Clean(seq)
+	  g := string(seq.Data())
+	  if g != w {
+		  t.Errorf("Clean() want:\n%s\nget:\n%s\n", w, g)
+	  }
+  }
+#+end_src
+#+begin_export latex
+We import \texttt{fasta}.
+#+end_export
+#+begin_src go <<Testing imports>>=
+  "github.com/evolbioinf/fasta"
+#+end_src
