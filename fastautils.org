@@ -9,7 +9,7 @@ The package \texttt{fastautils} has hooks for imports and functions.
   //<<Functions>>
 #+end_src
 #+begin_export latex
-\subsection{\texttt{Clean}}
+\subsection{Function \texttt{Clean}}
 !Function \texttt{Clean} removes non-canonical nucleotides from a
 !\texttt{Sequence} (that is, keeps only
 !\texttt{ATGC}/\texttt{atgc}). The function updates the input sequence
@@ -20,8 +20,10 @@ The package \texttt{fastautils} has hooks for imports and functions.
 	  d := s.Data()
 	  i := 0
 	  for _, c := range d {
-		  if c == 'A' || c == 'C' || c == 'G' || c == 'T' ||
-		     c == 'a' || c == 'c' || c == 'g' || c == 't' {
+		  if c == 'A' || c == 'C' ||
+		     c == 'G' || c == 'T' ||
+		     c == 'a' || c == 'c' ||
+		     c == 'g' || c == 't' {
 		       d[i] = c
 		       i++
 	     }
@@ -35,4 +37,94 @@ We import \texttt{fasta} and \texttt{bytes}.
 #+end_export
 #+begin_src go <<Imports>>=
   "github.com/evolbioinf/fasta"
+#+end_src
+#+begin_export latex
+\subsection{Function \texttt{DataToUpper}}
+!Function \texttt{DataToUpper} converts bytes of the \texttt{data}
+field to uppercase and updates the input \texttt{Sequence}.
+#+end_export
+#+begin_src go <<Methods>>=
+  func DataToUpper(s *fasta.Sequence) {
+	  d := s.Data()
+	  d = bytes.ToUpper(d)
+	  *s = *fasta.NewSequence(s.Header(), d)
+  }
+#+end_src
+#+begin_export latex
+\subsection{Function \texttt{ReadAll}}
+!\texttt{ReadAll} reads all sequences from a file and returns a slice
+!of \texttt{Sequence}s.
+#+end_export
+#+begin_src go <<Functions>>=
+  func ReadAll(f *os.File) []*fasta.Sequence {
+	  sc := fasta.NewScanner(f)
+	  var s []*fasta.Sequence
+	  for sc.ScanSequence() {
+		  s = append(s, sc.Sequence())
+	  }
+	  f.Close()
+	  return s
+  }
+#+end_src
+#+begin_export latex
+We impor \texttt{os}.
+#+end_export
+#+begin_src go <<Imports>>=
+  "os"
+#+end_src
+#+begin_export latex
+\subsection{Function \texttt{Concatenate}}
+!\texttt{Concatenate} accepts a slice of \texttt{Sequences} and a
+!sentinel byte. It concatenates the slice into a single
+!\texttt{Sequence} entry, where all headers and data are glued
+!together. The concatenated headers and pieces of data are separated
+!with the sentinel byte, if the latter is not zero.
+
+We initialize an error. We concatenate \texttt{Sequences} only if the
+input slice has more than one element. In the case of one-element
+slice, we just return the only element. If the slice is empty, we
+create an error message and return.
+#+end_export
+#+begin_src go <<Functions>>=
+  func Concatenate(seqSlice []*fasta.Sequence,
+	  sentinel byte) (*fasta.Sequence, error) {
+	  var err error
+	  l := len(seqSlice)
+	  switch {
+	  case l > 1:
+		  //<<Perform the concatenation>>
+	  case l == 1:
+		  return seqSlice[0], err
+	  default:
+		  err = fmt.Errorf("fastautils.Concatenate: " +
+			  "the input slice is empty\n")
+		  return nil, err
+	  }
+  }
+#+end_src
+#+begin_export latex
+We import \texttt{fmt}.
+#+end_export
+#+begin_src go <<Imports>>=
+  "fmt"
+#+end_src
+#+begin_export latex
+We get the first header and piece of the data, then we append
+subsequent headers and data to them while traversing the original
+slice. If there's a non-zero sentinel byte, we append it in the
+beginning of each iteration.
+#+end_export
+#+begin_src go <<Perform the concatenation>>=
+  h := []byte(seqSlice[0].Header())
+  d := seqSlice[0].Data()
+  for i := 1; i < l; i++ {
+	  if sentinel != 0 {
+		  h = append(h, sentinel)
+		  d = append(d, sentinel)
+	  }
+	  h = append(h, []byte(seqSlice[i].Header())...)
+	  d = append(d, seqSlice[i].Data()...)
+  }
+  cSeq := fasta.NewSequence(string(h), d)
+  return cSeq, err
 #+end_src

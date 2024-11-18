@@ -11,7 +11,7 @@ imports and functions.
   //<<Testing functions>>
 #+end_src
 #+begin_export latex
-\subsubsection{\texttt{Clean}}
+\subsection{Function \texttt{Clean}}
 To test this funtion, we generate a short sequence containing
 non-canonical nucleotides, call the function, and compare what we want
 with what we get.
@@ -33,4 +33,118 @@ We import \texttt{fasta}.
 #+end_export
 #+begin_src go <<Testing imports>>=
   "github.com/evolbioinf/fasta"
+#+end_src
+#+begin_export latex
+\subsection{Function \texttt{ReadAll}}
+To test \texttt{ReadAll}, we define expected lengths and read the test
+files (Table~\ref{tab:testfiles}).
+#+end_export
+#+begin_src go <<Testing functions>>=
+  func TestReadAll(t *testing.T) {
+	  expectedLen := [9]int{0, 0, 0, 5, 70, 140, 700, 1000, 1000}
+	  for i := 1; i < 9; i++ {
+		  name := "./data/seq" + strconv.Itoa(i) +
+			  ".fasta"
+		  f, err := os.Open(name)
+		  if err != nil {
+			  t.Errorf("couldn't open %q\n", name)
+		  }
+		  seqSlice := ReadAll(f)
+		  //<<Compare actual lengths to expected>>
+	  }
+  }
+#+end_src
+#+begin_export latex
+We import \texttt{strconv}.
+#+end_export
+#+begin_src go <<Testing imports>>=
+  "strconv"
+#+end_src
+#+begin_src latex
+We compare what we want with what we get.
+#+end_src
+#+begin_src go <<Compare actual lengths to expected>>=
+  w := expectedLen[i-1]
+  for entry, seq := range(seqSlice) {
+	  g := len(seq.Data())
+	  if g != w {
+		  t.Errorf("seq%d, entry %d - want: %d\nget: %d",
+			  i, entry, w, g)
+	  }
+  }
+#+end_src
+#+begin_src latex
+  \subsection{Function \texttt{Concatenate}}
+  To test \texttt{Concatenate}, we define expected values and read the
+  test files. Then we call the function, respond to the intentionally
+  broken inputs and compare actual values to expected.
+#+end_src
+#+begin_src go <<Testing functions>>=
+  func TestConcatenate(t *testing.T) {
+	  //<<Define expected values>>
+	  for i := 1; i < 9; i++ {
+		  name := "./data/seq" + strconv.Itoa(i) +
+			  ".fasta"
+		  f, err := os.Open(name)
+		  if err != nil {
+			  t.Errorf("couldn't open %q\n", name)
+		  }
+		  seqSlice := ReadAll(f)
+		  seq, err := Concatenate(seqSlice, '|')
+		  //<<Respond to empty slices>>
+		  //<<Compare actual values to expected>>
+	  }
+  }
+#+end_src
+#+begin_export latex
+We import \texttt{os}.
+#+end_export
+#+begin_src go <<Testing imports>>=
+  "os"
+#+end_src
+#+begin_export latex
+We expect \texttt{seq1.fasta} to be empty. This will result in a
+non-\texttt{nil} error, which is a valid result.
+#+end_export
+#+begin_src go <<Respond to empty slices>>= 
+  if err != nil {
+	  if i == 1 {
+		  continue
+	  }
+  }
+#+end_src
+#+begin_src latex
+We define an array of expected number of bytes in the data (including
+sentinels) and the anticipated headers.
+#+end_src
+#+begin_src go <<Define expected values>>=
+  wantDataLen := [9]int{0, 0, 0, 5, 2*70 + 1,
+	  2*140 + 1, 5*700 + 4, 5*1000 + 4}
+  wantHeaders := [9]string{"",
+	  "",
+	  "seq3",
+	  "Rand_1; G/C=0.20",
+	  "Rand_1; G/C=0.41|Rand_2; G/C=0.54",
+	  "Rand_1; G/C=0.50|Rand_2; G/C=0.50",
+	  "Rand_1; G/C=0.50|Rand_2; G/C=0.50|Rand_3; " +
+		  "G/C=0.50|Rand_4; G/C=0.50|Rand_5; G/C=0.50",
+	  "Rand_1; G/C=0.50|Rand_2; G/C=0.50|Rand_3; " +
+		  "G/C=0.50|Rand_4; G/C=0.50|Rand_5; G/C=0.50",
+	  "Rand_1; G/C=0.50|Rand_2; G/C=0.50|Rand_3; " +
+		  "G/C=0.50|Rand_4; G/C=0.50|Rand_5; G/C=0.50"}
+#+end_src
+#+begin_src latex
+We compare the header and data we get with what we want.
+#+end_src
+#+begin_src go <<Compare actual values to expected>>=
+  wl := wantDataLen[i-1]
+  gl := len(seq.Data())
+  if gl != wl {
+	  t.Errorf("%s data:\nget:\n%d\nwant:\n%d\n", name, gl, wl)
+  }
+  wh := wantHeaders[i-1]
+  gh := seq.Header()
+  if gh != wh {
+	  t.Errorf("%s headers:\nget:\n%s\nwant:\n%s\n", name, gh, wh)
+  }
 #+end_src
