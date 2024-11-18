@@ -1,6 +1,7 @@
 package fastautils
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/evolbioinf/fasta"
 	"os"
@@ -20,6 +21,13 @@ func Clean(s *fasta.Sequence) {
 		}
 	}
 	d = d[:i]
+	*s = *fasta.NewSequence(s.Header(), d)
+}
+
+// Function DataToUpper converts bytes of the data
+func DataToUpper(s *fasta.Sequence) {
+	d := s.Data()
+	d = bytes.ToUpper(d)
 	*s = *fasta.NewSequence(s.Header(), d)
 }
 

@@ -43,12 +43,18 @@ We import \texttt{fasta} and \texttt{bytes}.
 !Function \texttt{DataToUpper} converts bytes of the \texttt{data}
 field to uppercase and updates the input \texttt{Sequence}.
 #+end_export
-#+begin_src go <<Methods>>=
+#+begin_src go <<Functions>>=
   func DataToUpper(s *fasta.Sequence) {
 	  d := s.Data()
 	  d = bytes.ToUpper(d)
 	  *s = *fasta.NewSequence(s.Header(), d)
   }
+#+end_src
+#+begin_export latex
+We import \texttt{bytes}.
+#+end_export
+#+begin_src go <<Imports>>=
+  "bytes"
 #+end_src
 #+begin_export latex
 \subsection{Function \texttt{ReadAll}}
