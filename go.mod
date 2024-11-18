@@ -1,4 +1,4 @@
-module fastautil.go
+module github.com/ivantsers/fastautil
 
 go 1.23.0
 
