@@ -69,3 +69,14 @@ func Concatenate(seqSlice []*fasta.Sequence,
 		return nil, err
 	}
 }
+
+// AddReverseStrand appends the reverse complement sequence to a fasta entry under the same header. The strands are separated with a hash (\#).
+func AddReverseComplement(s *fasta.Sequence) {
+	d := s.Data()
+	var newD []byte
+	rev := fasta.NewSequence("reverse", d)
+	rev.ReverseComplement()
+	newD = append(newD, '#')
+	newD = append(newD, rev.Data()...)
+	*s = *fasta.NewSequence(s.Header(), newD)
+}
