@@ -135,8 +135,8 @@ beginning of each iteration.
   return cSeq, err
 #+end_src
 #+begin_export latex
-\subsection{Function \texttt{AddReverseStrand}}
-!\texttt{AddReverseStrand} appends the reverse complement sequence to
+\subsection{Function \texttt{AddReverseComplement}}
+!\texttt{AddReverseComplement} appends the reverse complement sequence to
 !a \texttt{fasta} entry under the same header. The strands are
 !separated with a hash (\#).
 #+end_export
@@ -146,7 +146,7 @@ beginning of each iteration.
 	  var newD []byte
 	  rev := fasta.NewSequence("reverse", d)
 	  rev.ReverseComplement()
-	  newD = append(newD, '#')
+	  newD = append(d, '#')
 	  newD = append(newD, rev.Data()...)
 	  *s = *fasta.NewSequence(s.Header(), newD)
   }
