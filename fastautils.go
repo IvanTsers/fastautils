@@ -12,16 +12,21 @@ func Clean(s *fasta.Sequence) {
 	d := s.Data()
 	i := 0
 	for _, c := range d {
-		if c == 'A' || c == 'C' ||
-			c == 'G' || c == 'T' ||
-			c == 'a' || c == 'c' ||
-			c == 'g' || c == 't' {
+		if isACGT[c] {
 			d[i] = c
 			i++
 		}
 	}
 	d = d[:i]
 	*s = *fasta.NewSequence(s.Header(), d)
+}
+
+var isACGT [256]bool
+
+func init() {
+	for _, c := range []byte("ACGTacgt") {
+		isACGT[c] = true
+	}
 }
 
 // Function DataToUpper converts bytes of the data

@@ -14,19 +14,19 @@ The package \texttt{fastautils} has hooks for imports and functions.
 !\texttt{Sequence} (that is, keeps only
 !\texttt{ATGC}/\texttt{atgc}). The function updates the input sequence
 !in place.
+
+We check if the byte is a non-ambiguous nucleotide using an array that
+we will initialize shortly.
 #+end_export
 #+begin_src go <<Functions>>=
   func Clean(s *fasta.Sequence) {
 	  d := s.Data()
 	  i := 0
 	  for _, c := range d {
-		  if c == 'A' || c == 'C' ||
-		     c == 'G' || c == 'T' ||
-		     c == 'a' || c == 'c' ||
-		     c == 'g' || c == 't' {
-		       d[i] = c
-		       i++
-	     }
+		  if isACGT[c] {
+			  d[i] = c
+			  i++
+		  }
 	  }
 	  d = d[:i]
 	  *s = *fasta.NewSequence(s.Header(), d)
@@ -37,6 +37,19 @@ We import \texttt{fasta} and \texttt{bytes}.
 #+end_export
 #+begin_src go <<Imports>>=
   "github.com/evolbioinf/fasta"
+#+end_src
+#+begin_export latex
+The array \ty{isACGT} stores \texttt{true} for bytes A, C, G, T, a, c,
+g, t. The map is filled with values in the \texttt{init} function.
+#+end_export
+#+begin_src go <<Functions>>=
+  var isACGT [256]bool
+
+  func init() {
+	  for _, c := range []byte("ACGTacgt") {
+		  isACGT[c] = true
+	  }
+  }
 #+end_src
 #+begin_export latex
 \subsection{Function \texttt{DataToUpper}}
