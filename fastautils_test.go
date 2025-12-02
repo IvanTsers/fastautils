@@ -8,8 +8,8 @@ import (
 )
 
 func TestClean(t *testing.T) {
-	s := "XXATATNGTnCactAploenTTg"
-	w := "ATATGTCactATTg"
+	s := "XXAtaTNGTnCactAploenTTg"
+	w := "ATATGTCACTATTG"
 	seq := fasta.NewSequence("", []byte(s))
 	Clean(seq)
 	g := string(seq.Data())

@@ -1,39 +1,32 @@
 package fastautils
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/evolbioinf/fasta"
 	"os"
 )
 
-// Function Clean removes non-canonical nucleotides from a Sequence (that is, keeps only ATGC/atgc). The function updates the input sequence in place.
+// Function Clean removes non-canonical nucleotides from a Sequence (that is, keeps only ATGC). The function updates the input sequence in place.
 func Clean(s *fasta.Sequence) {
 	d := s.Data()
 	i := 0
 	for _, c := range d {
-		if isACGT[c] {
-			d[i] = c
+		u := c &^ 0x20
+		if isACGT[u] {
+			d[i] = u
 			i++
 		}
 	}
 	d = d[:i]
-	*s = *fasta.NewSequence(s.Header(), d)
+	s.SetData(d)
 }
 
 var isACGT [256]bool
 
 func init() {
-	for _, c := range []byte("ACGTacgt") {
+	for _, c := range []byte("ACGT") {
 		isACGT[c] = true
 	}
-}
-
-// Function DataToUpper converts bytes of the data
-func DataToUpper(s *fasta.Sequence) {
-	d := s.Data()
-	d = bytes.ToUpper(d)
-	*s = *fasta.NewSequence(s.Header(), d)
 }
 
 // ReadAll reads all sequences from a file and returns a slice of Sequences.
@@ -83,5 +76,5 @@ func AddReverseComplement(s *fasta.Sequence) {
 	rev.ReverseComplement()
 	newD = append(d, '#')
 	newD = append(newD, rev.Data()...)
-	*s = *fasta.NewSequence(s.Header(), newD)
+	s.SetData(newD)
 }

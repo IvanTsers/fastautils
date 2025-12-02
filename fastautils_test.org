@@ -18,8 +18,8 @@ with what we get.
 #+end_export
 #+begin_src go <<Testing functions>>=
   func TestClean(t *testing.T){
-	  s := "XXATATNGTnCactAploenTTg"
-	  w := "ATATGTCactATTg"
+	  s := "XXAtaTNGTnCactAploenTTg"
+	  w := "ATATGTCACTATTG"
 	  seq := fasta.NewSequence("", []byte(s))
 	  Clean(seq)
 	  g := string(seq.Data())

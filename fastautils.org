@@ -11,25 +11,31 @@ The package \texttt{fastautils} has hooks for imports and functions.
 #+begin_export latex
 \subsection{Function \texttt{Clean}}
 !Function \texttt{Clean} removes non-canonical nucleotides from a
-!\texttt{Sequence} (that is, keeps only
-!\texttt{ATGC}/\texttt{atgc}). The function updates the input sequence
-!in place.
+!\texttt{Sequence} (that is, keeps only \texttt{ATGC}). The function
+!updates the input sequence in place.
 
-We check if the byte is a non-ambiguous nucleotide using an array that
-we will initialize shortly.
+For each byte of the data, we clear the fifth "case" bit $00100000_2$
+(hexadecimal 0x20). For example, the ASCII byte value for
+\texttt{a} is $01100001_2$, and for \texttt{A} it's
+$01000001_2$. Thus, if we'subtract $00100000_2$ from $01100001_2$, we
+go from \texttt{a} to \texttt{A}.
+
+Once we have subtracted the bit, we check if the byte is a non-ambiguous
+nucleotide using an array that we will initialize shortly.
 #+end_export
 #+begin_src go <<Functions>>=
   func Clean(s *fasta.Sequence) {
 	  d := s.Data()
 	  i := 0
 	  for _, c := range d {
-		  if isACGT[c] {
-			  d[i] = c
+		  u := c &^ 0x20
+		  if isACGT[u] {
+			  d[i] = u
 			  i++
 		  }
 	  }
 	  d = d[:i]
-	  *s = *fasta.NewSequence(s.Header(), d)
+	  s.SetData(d)
   }
 #+end_src
 #+begin_export latex
@@ -39,35 +45,17 @@ We import \texttt{fasta} and \texttt{bytes}.
   "github.com/evolbioinf/fasta"
 #+end_src
 #+begin_export latex
-The array \ty{isACGT} stores \texttt{true} for bytes A, C, G, T, a, c,
-g, t. The map is filled with values in the \texttt{init} function.
+The array \texttt{isACGT} stores \texttt{true} for bytes A, C, G, T. The
+map is filled with values in the \texttt{init} function.
 #+end_export
 #+begin_src go <<Functions>>=
   var isACGT [256]bool
 
   func init() {
-	  for _, c := range []byte("ACGTacgt") {
+	  for _, c := range []byte("ACGT") {
 		  isACGT[c] = true
 	  }
   }
-#+end_src
-#+begin_export latex
-\subsection{Function \texttt{DataToUpper}}
-!Function \texttt{DataToUpper} converts bytes of the \texttt{data}
-field to uppercase and updates the input \texttt{Sequence}.
-#+end_export
-#+begin_src go <<Functions>>=
-  func DataToUpper(s *fasta.Sequence) {
-	  d := s.Data()
-	  d = bytes.ToUpper(d)
-	  *s = *fasta.NewSequence(s.Header(), d)
-  }
-#+end_src
-#+begin_export latex
-We import \texttt{bytes}.
-#+end_export
-#+begin_src go <<Imports>>=
-  "bytes"
 #+end_src
 #+begin_export latex
 \subsection{Function \texttt{ReadAll}}
@@ -161,6 +149,6 @@ beginning of each iteration.
 	  rev.ReverseComplement()
 	  newD = append(d, '#')
 	  newD = append(newD, rev.Data()...)
-	  *s = *fasta.NewSequence(s.Header(), newD)
+	  s.SetData(newD)
   }
 #+end_src

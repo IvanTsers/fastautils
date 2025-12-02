@@ -17,8 +17,12 @@ doc:
 clean:
 	rm -f $(EXE) *.go
 	make clean -C doc
-	
+
 init:
 	go mod init $(EXE)
 	go mod tidy
 
+publish:
+	if mountpoint -q ~/owncloud; then \
+		cp doc/$(EXE)Doc.pdf ~/owncloud/github_docs; \
+	fi
