@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/evolbioinf/fasta"
 	"os"
+	"regexp"
 )
 
 // Function Clean removes non-canonical nucleotides from a Sequence (that is, keeps only ATGC). The function updates the input sequence in place.
@@ -77,4 +78,17 @@ func AddReverseComplement(s *fasta.Sequence) {
 	newD = append(d, '#')
 	newD = append(newD, rev.Data()...)
 	s.SetData(newD)
+}
+
+// The function FindByHeader accepts a slice of sequences and returns a sub-slice of sequences, headers of which match the specified pattern.
+func FindByHeader(ss []*fasta.Sequence, p string) []*fasta.Sequence {
+	var res []*fasta.Sequence
+	r := regexp.MustCompile(p)
+	for _, s := range ss {
+		h := s.Header()
+		if r.MatchString(h) {
+			res = append(res, s)
+		}
+	}
+	return res
 }

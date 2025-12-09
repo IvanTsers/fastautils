@@ -152,3 +152,39 @@ beginning of each iteration.
 	  s.SetData(newD)
   }
 #+end_src
+#+begin_export latex
+\subsection{Function \texttt{FindByHeader}}
+!The function \texttt{FindByHeader} accepts a slice of sequences and
+!returns a sub-slice of sequences, headers of which match the
+!specified pattern.
+
+We initialize a return variable and compile a regular expression using
+the specified pattern. Then we iterate over the input slice and match
+sequence headers.
+#+end_export
+#+begin_src go <<Functions>>=
+  func FindByHeader(ss []*fasta.Sequence, p string) []*fasta.Sequence {
+	  var res []*fasta.Sequence
+	  r := regexp.MustCompile(p)
+	  for _, s := range ss {
+		  //<<Match headers>>
+	  }
+	  return res
+  }
+#+end_src
+#+begin_export latex
+We import \texttt{regexp}.
+#+end_export
+#+begin_src go <<Imports>>=
+  "regexp"
+#+end_src
+#+begin_export latex
+We get the sequence's header. If the pattern matches it, we append the
+sequence to the slice of results.
+#+end_export
+#+begin_src go <<Match headers>>=
+  h := s.Header()
+  if r.MatchString(h) {
+	  res = append(res, s)
+  }
+#+end_src

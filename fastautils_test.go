@@ -78,3 +78,16 @@ func TestConcatenate(t *testing.T) {
 		}
 	}
 }
+func TestFindByName(t *testing.T) {
+	s := "AACACACACAC"
+	seq1 := fasta.NewSequence("seq1_neighbor", []byte(s))
+	s = "TGTGTGTGTG"
+	seq2 := fasta.NewSequence("seq2_target", []byte(s))
+	sequences := []*fasta.Sequence{seq1, seq2}
+
+	get := FindByHeader(sequences, "target")
+	want := seq2
+	if get[0] != want {
+		t.Errorf("get:\n%v\nwant:\n%v\n", get, want)
+	}
+}

@@ -148,3 +148,25 @@ We compare the header and data we get with what we want.
 	  t.Errorf("%s headers:\nget:\n%s\nwant:\n%s\n", name, gh, wh)
   }
 #+end_src
+#+begin_src latex
+  \subsection{Function \texttt{FindByHeader}}
+  To test \texttt{FindByHeader}, we create a slice of two short
+  sequences with set names. Then we call the function with the pattern
+  "target". We expect to get \texttt{seq2} as it contains the word
+  "target" in the header.
+#+end_src
+#+begin_src go <<Testing functions>>=
+  func TestFindByName(t *testing.T) {
+	  s := "AACACACACAC"
+	  seq1 := fasta.NewSequence("seq1_neighbor", []byte(s))
+	  s = "TGTGTGTGTG"
+	  seq2 := fasta.NewSequence("seq2_target", []byte(s))
+	  sequences := []*fasta.Sequence{seq1, seq2}
+
+	  get := FindByHeader(sequences, "target")
+	  want := seq2
+	  if get[0] != want {
+		  t.Errorf("get:\n%v\nwant:\n%v\n", get, want)
+	  }
+  }
+#+end_src
