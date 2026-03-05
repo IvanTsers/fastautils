@@ -1,6 +1,7 @@
 package fastautils
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/evolbioinf/fasta"
 	"os"
@@ -28,6 +29,13 @@ func init() {
 	for _, c := range []byte("ACGT") {
 		isACGT[c] = true
 	}
+}
+
+// Function DataToUpper converts bytes of the data
+func DataToUpper(s *fasta.Sequence) {
+	d := s.Data()
+	d = bytes.ToUpper(d)
+	*s = *fasta.NewSequence(s.Header(), d)
 }
 
 // ReadAll reads all sequences from a file and returns a slice of Sequences.
